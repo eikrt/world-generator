@@ -1,5 +1,6 @@
-#include "app.h"
+#include "gui.h"
 #include "SDL2/SDL.h"
+#include "../generator/generator.h"
 #include <stdio.h>
 #include <string>
 const int SCREEN_WIDTH = 640;
@@ -39,7 +40,7 @@ int main() {
         }
 	screenSurface = SDL_GetWindowSurface(window);
 	SDL_FillRect(screenSurface, NULL, SDL_MapRGB(screenSurface->format, 0xFF,0xFF,0xFF));
-	hello = loadImage(screenSurface, "res/tile.bmp");
+	hello = loadImage(screenSurface, "../res/tile.bmp");
 	if (hello == NULL){
 		printf("failed to load img");
 
