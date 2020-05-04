@@ -70,7 +70,7 @@ int* createMap(){
 	static int map[SIZE*SIZE];
 	for (int i = 0; i <SIZE; i++){
 		for (int j = 0; j < SIZE; j++){
-		int val = perlin(i,j,0.1,4)*10;
+		int val = perlin(i,j,0.1,1)*10;
 		int roundVal = floor(val);	
 		map[(i)*j] =  roundVal;
 		}
