@@ -82,14 +82,20 @@ int* createMap(){
 
 int main(){
 	int* map = createMap();
+	FILE *file;
+	file = fopen("map/map.txt", "w");
+	
 	for (int i = 0; i < SIZE; i++){
 		for (int j = 0; j < SIZE; j++){
+				
 			printf("%i ",map[i*j]);
-			
+			fprintf(file,"%i", map[i*j]);
 		}
+	
+	putc('\n',file);
 	printf("\n");
 	}
+	fclose(file);
 	return 0;	
 }
-
 
