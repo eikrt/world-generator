@@ -6,7 +6,8 @@
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 struct Tile{
-	char height;
+	char height;	
+	SDL_Texture* texture = NULL;
 	SDL_Rect rect;
 };
 SDL_Surface* loadImage(SDL_Surface* screenSurface, std::string path){
@@ -16,13 +17,6 @@ SDL_Surface* loadImage(SDL_Surface* screenSurface, std::string path){
 	if (loadedSurface == NULL) {
 		printf("image loading failed");
 	}
-//	else {
-//		betterSurface = SDL_ConvertSurface(loadedSurface,screenSurface->format, 0);
-//		if (betterSurface == NULL) {
-//			printf("image optimizing failed");
-//		}
-//			SDL_FreeSurface (loadedSurface);
-//	}
 	return loadedSurface;
 
 }
@@ -43,61 +37,75 @@ int main() {
 	SDL_Window* window = NULL;
 	SDL_Surface* screenSurface = NULL;
 	SDL_Renderer* renderer = NULL;
-	SDL_Texture* texture = NULL;
-	SDL_Texture* texture2 = NULL;
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 
 		printf("SDL couldn't initialize");	
 	}
 	else {
-		window = SDL_CreateWindow( "Project", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN );
+		window = SDL_CreateWindow( "World", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN );
 		renderer = SDL_CreateRenderer(window,-1, SDL_RENDERER_ACCELERATED);       		
 		if( window == NULL ) {
             	printf( "Error: %s\n", SDL_GetError());
         	}
 		screenSurface = SDL_GetWindowSurface(window);
-
-		texture = loadTexture(screenSurface, renderer, "../res/tile.bmp");
-		texture2 = loadTexture(screenSurface, renderer, "../res/ground.bmp");
-		
-
 		SDL_SetRenderDrawColor(renderer, 0xFF,0xFF, 0xFF, 0xFF);
-////		SDL_FillRect(screenSurface, NULL, SDL_MapRGB(screenSurface->format, 0xFF,0xFF,0xFF));
-
-
-//		SDL_UpdateWindowSurface(window);
-	
-	
 
 	}
-	loop(window, screenSurface, renderer, texture,texture2);
+	loop(window, screenSurface, renderer);
 	return 0;
 }
 
 void init(){
 	
 }
-void loop(SDL_Window *window, SDL_Surface *screenSurface, SDL_Renderer* renderer, SDL_Texture* tex, SDL_Texture* tex2){
+void loop(SDL_Window *window, SDL_Surface *screenSurface, SDL_Renderer* renderer){
 	bool running = true;
 	SDL_Event e;
+		
 	
-	struct Tile tiles[64][64];
+	
+	struct Tile tiles[32][32];
+	char ch;
+	int size = 0;
+	FILE* fp1 = fopen("/home/eino/repo/world-generator/generator/map/map.txt", "r");
+	while ((ch = getc(fp1)) != '\n') {
+		size++;
+	}
+	fclose(fp1);
+	
 	FILE* fp;
 	fp = fopen("/home/eino/repo/world-generator/generator/map/map.txt", "r");	
 	if (fp == NULL) {
 		printf("error while opening file");
 	}
 
-	char ch;
-	for (int i = 0; i < 64; i++) {		
-		for (int j = 0; j < 64; j++) {
-			ch = getc(fp);
-			tiles[i][j].height = ch;
-			tiles[i][j].rect.x = i*16;
-			tiles[i][j].rect.y = j*16;
-			tiles[i][j].rect.w = 16;
-			tiles[i][j].rect.h = 16;
-	}
+	int lines = 0;
+	int charAt = 0;
+	char c;
+
+	while(lines <size) {
+
+			ch = getc(fp);	
+
+
+
+
+			tiles[charAt][lines].height = ch;
+			tiles[charAt][lines].rect.x = charAt*16;
+			tiles[charAt][lines].rect.y = lines*16;
+			tiles[charAt][lines].rect.w = 16;
+			tiles[charAt][lines].rect.h = 16;
+			if (ch == '0')
+				tiles[charAt][lines].texture = loadTexture(screenSurface,renderer,"/home/eino/repo/world-generator/res/tile.bmp");
+			else
+			
+				tiles[charAt][lines].texture = loadTexture(screenSurface,renderer,"/home/eino/repo/world-generator/res/ground.bmp");
+
+			charAt++;
+			if (charAt == size) {
+				lines++;
+				charAt = 0;
+			}
 	}
 	fclose(fp);
 	while(running) {
@@ -110,13 +118,9 @@ void loop(SDL_Window *window, SDL_Surface *screenSurface, SDL_Renderer* renderer
 		}
 		SDL_RenderClear( renderer );
 
-		for (int i = 0; i < 64; i++) {	
-			for (int j = 0; j < 64; j++) {
-				if (tiles[i][j].height == '0')						
-               				SDL_RenderCopy( renderer, tex, NULL, &tiles[i][j].rect);
-				else
-               				SDL_RenderCopy( renderer, tex2, NULL, &tiles[i][j].rect);
-
+		for (int i = 0; i < size; i++) {	
+			for (int j = 0; j < size; j++) {
+               			SDL_RenderCopy( renderer, tiles[i][j].texture, NULL, &tiles[i][j].rect);
 			}		
 		}
 
