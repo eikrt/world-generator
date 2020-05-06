@@ -4,7 +4,7 @@
 #include <time.h>
 #include <math.h>
 
-#define SIZE 32
+#define SIZE 256
 
 
 const int SEED = 0;

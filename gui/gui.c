@@ -3,8 +3,8 @@
 #include "../generator/generator.h"
 #include <stdio.h>
 #include <string>
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
+const int SCREEN_WIDTH = 640*2;
+const int SCREEN_HEIGHT = 480*2;
 struct Tile{
 	char height;	
 	SDL_Texture* texture = NULL;
@@ -64,7 +64,7 @@ void loop(SDL_Window *window, SDL_Surface *screenSurface, SDL_Renderer* renderer
 		
 	
 	
-	struct Tile tiles[32][32];
+
 	char ch;
 	int size = 0;
 	FILE* fp1 = fopen("/home/eino/repo/world-generator/generator/map/map.txt", "r");
@@ -73,6 +73,7 @@ void loop(SDL_Window *window, SDL_Surface *screenSurface, SDL_Renderer* renderer
 	}
 	fclose(fp1);
 	
+	struct Tile tiles[size][size];
 	FILE* fp;
 	fp = fopen("/home/eino/repo/world-generator/generator/map/map.txt", "r");	
 	if (fp == NULL) {
@@ -95,7 +96,7 @@ void loop(SDL_Window *window, SDL_Surface *screenSurface, SDL_Renderer* renderer
 			tiles[charAt][lines].rect.y = lines*16;
 			tiles[charAt][lines].rect.w = 16;
 			tiles[charAt][lines].rect.h = 16;
-			if (ch == '0')
+			if (ch == '0' || ch == '1' || ch == '2'||ch == '3'|| ch == '4'|| ch == '5')
 				tiles[charAt][lines].texture = loadTexture(screenSurface,renderer,"/home/eino/repo/world-generator/res/tile.bmp");
 			else
 			
@@ -108,6 +109,10 @@ void loop(SDL_Window *window, SDL_Surface *screenSurface, SDL_Renderer* renderer
 			}
 	}
 	fclose(fp);
+
+
+
+
 	while(running) {
 		while (SDL_PollEvent(&e) != 0)
 			{
@@ -115,7 +120,27 @@ void loop(SDL_Window *window, SDL_Surface *screenSurface, SDL_Renderer* renderer
 			if (e.type == SDL_QUIT){
 				running = false;
 			}
+else if( e.type == SDL_KEYDOWN )
+                    {
+                        //Select surfaces based on key press
+                        switch( e.key.keysym.sym )
+                        {
+
+                            case SDLK_UP:
+                            break;
+			
+                            case SDLK_DOWN:
+                            break;
+			
+                            case SDLK_LEFT:
+                            break;
+		
+                            case SDLK_RIGHT:
+                            break;
+
+			}
 		}
+}
 		SDL_RenderClear( renderer );
 
 		for (int i = 0; i < size; i++) {	
@@ -125,8 +150,11 @@ void loop(SDL_Window *window, SDL_Surface *screenSurface, SDL_Renderer* renderer
 		}
 
 		SDL_RenderPresent(renderer);		
-	}	
+	
+	SDL_Delay(1000);
+}	
 quit(window);
+	
 }
 int quit(SDL_Window *window){
 	SDL_DestroyWindow(window);
