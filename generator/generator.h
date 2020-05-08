@@ -5,6 +5,6 @@ float interpol(float x, float y, float s);
 float smoothening(float x, float y, float s);
 float noise(int* table, float x, float y);
 float perlin(float x, float y, float freq, int depth);
-int* createMap();
+struct Tile* createMap();
 int main();
 #endif

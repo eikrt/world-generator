@@ -3,12 +3,12 @@
 #include "../generator/generator.h"
 #include <stdio.h>
 #include <string>
+#include "../world/tile.h";
 const int SCREEN_WIDTH = 640*2;
 const int SCREEN_HEIGHT = 480*2;
-struct Tile{
-	char height;	
-	SDL_Texture* texture = NULL;
-	SDL_Rect rect;
+struct Camera{
+	int x;
+	int y;
 };
 SDL_Surface* loadImage(SDL_Surface* screenSurface, std::string path){
 
@@ -60,6 +60,9 @@ void init(){
 }
 void loop(SDL_Window *window, SDL_Surface *screenSurface, SDL_Renderer* renderer){
 	bool running = true;
+	struct Camera camera;
+	camera.x = 0;
+	camera.y = 0;
 	SDL_Event e;
 		
 	
@@ -67,7 +70,7 @@ void loop(SDL_Window *window, SDL_Surface *screenSurface, SDL_Renderer* renderer
 
 	char ch;
 	int size = 0;
-	FILE* fp1 = fopen("/home/eino/repo/world-generator/generator/map/map.txt", "r");
+	FILE* fp1 = fopen("../generator/map/map.txt", "r");
 	while ((ch = getc(fp1)) != '\n') {
 		size++;
 	}
@@ -75,11 +78,11 @@ void loop(SDL_Window *window, SDL_Surface *screenSurface, SDL_Renderer* renderer
 	
 	struct Tile tiles[size][size];
 	FILE* fp;
-	fp = fopen("/home/eino/repo/world-generator/generator/map/map.txt", "r");	
+	fp = fopen("../generator/map/map.txt", "r");	
 	if (fp == NULL) {
 		printf("error while opening file");
 	}
-
+	
 	int lines = 0;
 	int charAt = 0;
 	char c;
@@ -97,10 +100,10 @@ void loop(SDL_Window *window, SDL_Surface *screenSurface, SDL_Renderer* renderer
 			tiles[charAt][lines].rect.w = 16;
 			tiles[charAt][lines].rect.h = 16;
 			if (ch == '0' || ch == '1' || ch == '2'||ch == '3'|| ch == '4'|| ch == '5')
-				tiles[charAt][lines].texture = loadTexture(screenSurface,renderer,"/home/eino/repo/world-generator/res/tile.bmp");
+				tiles[charAt][lines].texture = loadTexture(screenSurface,renderer,"../res/tile.bmp");
 			else
 			
-				tiles[charAt][lines].texture = loadTexture(screenSurface,renderer,"/home/eino/repo/world-generator/res/ground.bmp");
+				tiles[charAt][lines].texture = loadTexture(screenSurface,renderer,"../res/ground.bmp");
 
 			charAt++;
 			if (charAt == size) {
@@ -127,15 +130,16 @@ else if( e.type == SDL_KEYDOWN )
                         {
 
                             case SDLK_UP:
-                            break;
-			
+                            camera.y -= 16;
+				break;
                             case SDLK_DOWN:
+                            camera.y += 16;
                             break;
-			
                             case SDLK_LEFT:
+                            camera.x -= 16;
                             break;
-		
                             case SDLK_RIGHT:
+                            camera.x += 16;
                             break;
 
 			}
@@ -145,13 +149,21 @@ else if( e.type == SDL_KEYDOWN )
 
 		for (int i = 0; i < size; i++) {	
 			for (int j = 0; j < size; j++) {
-               			SDL_RenderCopy( renderer, tiles[i][j].texture, NULL, &tiles[i][j].rect);
+				
+				SDL_Rect renderRect;
+
+				renderRect.x = tiles[i][j].rect.x-camera.x;
+				renderRect.y = tiles[i][j].rect.y-camera.y;
+				renderRect.h = 16;
+				renderRect.w = 16;
+               			SDL_RenderCopy( renderer, tiles[i][j].texture, NULL, &renderRect);
+			
 			}		
 		}
 
 		SDL_RenderPresent(renderer);		
 	
-	SDL_Delay(1000);
+	SDL_Delay(100);
 }	
 quit(window);
 	

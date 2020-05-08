@@ -3,8 +3,8 @@
 #include <stdio.h>
 #include <time.h>
 #include <math.h>
-
-#define SIZE 256
+#include "../world/tile.h"
+#define SIZE 32
 
 
 const int SEED = 0;
@@ -66,36 +66,61 @@ float perlin(float x, float y, float freq, int depth) // main noise function
 	return value;
 }
 
-int* createMap(){
-	static int map[SIZE*SIZE];
+struct Tile* createMap(){
+	static struct Tile map[SIZE*SIZE];
 	for (int i = 0; i <SIZE; i++){
 		for (int j = 0; j < SIZE; j++){
 		int val = perlin(i,j,0.1,1)*10;
 		int roundVal = floor(val);	
-		map[(i)*j] =  roundVal;
+		map[(i)*j].height=roundVal;
 		}
 		
 	}
 	return map;
 }
 
-
-int main(){
-	int* map = createMap();
-	FILE *file;
-	file = fopen("map/map.txt", "w");
-	
-	for (int i = 0; i < SIZE; i++){
-		for (int j = 0; j < SIZE; j++){
-				
-			printf("%i ",map[i*j]);
-			fprintf(file,"%i", map[i*j]);
-		}
-	
-	putc('\n',file);
-	printf("\n");
+void saveWorld(struct Tile* map, const char * fileName)
+{
+  FILE* fp = fopen(fileName,"wb");
+  fwrite( map, 1, sizeof(map), fp);
+  fclose(fp);
+}
+int openWorld(struct Tile* map, const char * fileName)
+{
+	FILE* fp = fopen(fileName,"rb");
+	if( !fp ) return 0;
+	int n = 0;
+	for (n=0; !feof(ptr); ++n) {
+		if ( fread(&a[n],sizeof(map),1,fp) != 1) break;
 	}
-	fclose(file);
+fclose(ptr);
+return n;
+}
+int main(){
+	struct Tile* map = createMap();
+	saveWorld(map, "map/map.dat");
+//	printf("%i", map[0].height);
+//	FILE *file;
+//	file = fopen("map/map.txt", "w");
+	
+//	for (int i = 0; i < SIZE; i++){
+//		for (int j = 0; j < SIZE; j++){
+//							
+//			printf("%i ",map[i*j].height);
+//			fprintf(file,"%c", map[i*j].height);
+//		}
+//	}	
+	//putc('\n',file);
+	//printf("\n");
+//	}
+//	fclose(file);
+	//FILE *fp;
+	//fp = fopen("map/map.dat", "wb");
+	//struct Tile tile;
+	//tile.height = 0;
+	
+//	fwrite (&tile, sizeof(struct Tile), 1, fp);
+//	fclose(fp);
 	return 0;	
 }
 
