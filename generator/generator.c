@@ -82,23 +82,35 @@ struct Tile* createMap(){
 void saveWorld(struct Tile* map, const char * fileName)
 {
   FILE* fp = fopen(fileName,"wb");
-  fwrite( map, 1, sizeof(map), fp);
+
+	for (int i = 0; i < SIZE; i++){
+	for (int j = 0; j < SIZE; j++){
+  		fwrite( &map[i*j], sizeof(struct Tile), 1, fp);
+		}
+	}
   fclose(fp);
 }
-int openWorld(struct Tile* map, const char * fileName)
+int openWorld(const char * fileName)
 {
 	FILE* fp = fopen(fileName,"rb");
 	if( !fp ) return 0;
 	int n = 0;
-	for (n=0; !feof(ptr); ++n) {
-		if ( fread(&a[n],sizeof(map),1,fp) != 1) break;
+	struct Tile tile;
+	for (n=0; !feof(fp); ++n) {
+		fread(&tile, sizeof(struct Tile), 1, fp);
+
+      		printf("%i", tile.height);
+		
+		if (n%SIZE == 0)
+			printf("%c", '\n'); 
 	}
-fclose(ptr);
+fclose(fp);
 return n;
 }
 int main(){
 	struct Tile* map = createMap();
 	saveWorld(map, "map/map.dat");
+	openWorld("map/map.dat");
 //	printf("%i", map[0].height);
 //	FILE *file;
 //	file = fopen("map/map.txt", "w");
