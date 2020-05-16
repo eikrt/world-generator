@@ -2,35 +2,15 @@
 #include "SDL2/SDL.h"
 #include "../generator/generator.h"
 #include <stdio.h>
-#include <string>
-#include "../world/tile.h";
+#include "../world/tile.h"
+#include "../file/file.h"
+#include "../io/imgload.h"
 const int SCREEN_WIDTH = 640*2;
 const int SCREEN_HEIGHT = 480*2;
 struct Camera{
 	int x;
 	int y;
 };
-SDL_Surface* loadImage(SDL_Surface* screenSurface, std::string path){
-
-	SDL_Surface* betterSurface = NULL;
-	SDL_Surface* loadedSurface = SDL_LoadBMP(path.c_str());
-	if (loadedSurface == NULL) {
-		printf("image loading failed");
-	}
-	return loadedSurface;
-
-}
-
-
-SDL_Texture* loadTexture(SDL_Surface* screenSurface, SDL_Renderer* renderer, std::string path) {
-	SDL_Texture* texture = NULL;
-	SDL_Surface* surface = loadImage(screenSurface,path);
-	texture = SDL_CreateTextureFromSurface(renderer, surface);
-	SDL_FreeSurface(surface);
-	return texture;
-		
-}
-
 
 int main() {
 	init();
@@ -59,76 +39,44 @@ void init(){
 	
 }
 void loop(SDL_Window *window, SDL_Surface *screenSurface, SDL_Renderer* renderer){
-	bool running = true;
+	int running = 1;
 	struct Camera camera;
 	camera.x = 0;
 	camera.y = 0;
 	SDL_Event e;
-		
-	
-	
-
-	char ch;
-	int size = 0;
-	FILE* fp1 = fopen("../generator/map/map.txt", "r");
-	while ((ch = getc(fp1)) != '\n') {
-		size++;
-	}
-	fclose(fp1);
-	
-	struct Tile tiles[size][size];
-	FILE* fp;
-	fp = fopen("../generator/map/map.txt", "r");	
-	if (fp == NULL) {
-		printf("error while opening file");
-	}
-	
-	int lines = 0;
-	int charAt = 0;
-	char c;
-
-	while(lines <size) {
-
-			ch = getc(fp);	
-
-
-
-
-			tiles[charAt][lines].height = ch;
-			tiles[charAt][lines].rect.x = charAt*16;
-			tiles[charAt][lines].rect.y = lines*16;
-			tiles[charAt][lines].rect.w = 16;
-			tiles[charAt][lines].rect.h = 16;
-			if (ch == '0' || ch == '1' || ch == '2'||ch == '3'|| ch == '4'|| ch == '5')
-				tiles[charAt][lines].texture = loadTexture(screenSurface,renderer,"../res/tile.bmp");
-			else
+	struct Tile* map;
+	map = openWorld("../generator/map/map.dat");
+	for (int i = 0; i < SIZE; i++){
+		for (int j = 0; j < SIZE; j++){
+			if (map[i*j].height < 1){
+			int rgb[] = {0,100,100};
 			
-				tiles[charAt][lines].texture = loadTexture(screenSurface,renderer,"../res/ground.bmp");
+			map[i*j].texture = loadTexture(screenSurface, renderer, "../res/water.bmp", rgb);
+		}
+			else {
+			int rgb[] = {200-0.8*map[i*j].height,255-0.8*map[i*j].height,255-0.4*map[i*j].height};	
 
-			charAt++;
-			if (charAt == size) {
-				lines++;
-				charAt = 0;
+			map[i*j].texture = loadTexture(screenSurface, renderer, "../res/ground.bmp", rgb);
 			}
 	}
-	fclose(fp);
+	
+	}	
 
 
 
 
-	while(running) {
+	while(running==1) {
+		
 		while (SDL_PollEvent(&e) != 0)
 			{
 
 			if (e.type == SDL_QUIT){
-				running = false;
+				running = 0;
 			}
 else if( e.type == SDL_KEYDOWN )
                     {
-                        //Select surfaces based on key press
                         switch( e.key.keysym.sym )
                         {
-
                             case SDLK_UP:
                             camera.y -= 16;
 				break;
@@ -141,32 +89,28 @@ else if( e.type == SDL_KEYDOWN )
                             case SDLK_RIGHT:
                             camera.x += 16;
                             break;
-
 			}
 		}
 }
 		SDL_RenderClear( renderer );
 
-		for (int i = 0; i < size; i++) {	
-			for (int j = 0; j < size; j++) {
+		for (int i = 0; i < SIZE; i++) {	
+			for (int j = 0; j < SIZE; j++) {
 				
 				SDL_Rect renderRect;
-
-				renderRect.x = tiles[i][j].rect.x-camera.x;
-				renderRect.y = tiles[i][j].rect.y-camera.y;
+				map[i*j].rect.x = i*16;
+				map[i*j].rect.y = j*16;	
+				renderRect.x = map[i*j].rect.x-camera.x;
+				renderRect.y = map[i*j].rect.y-camera.y;
 				renderRect.h = 16;
 				renderRect.w = 16;
-               			SDL_RenderCopy( renderer, tiles[i][j].texture, NULL, &renderRect);
-			
+               			SDL_RenderCopy( renderer, map[i*j].texture, NULL, &renderRect);
 			}		
 		}
-
 		SDL_RenderPresent(renderer);		
-	
 	SDL_Delay(100);
 }	
 quit(window);
-	
 }
 int quit(SDL_Window *window){
 	SDL_DestroyWindow(window);

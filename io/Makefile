@@ -1,4 +1,4 @@
-OBJS = gui.c gui.h ../file/file.c ../file/file.h ../io/imgload.c ../io/imgload.h
+OBJS = imgload.c imgload.h
 
 CC = gcc
 
