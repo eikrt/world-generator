@@ -29,10 +29,7 @@ struct Tile* openWorld(const char * fileName)
 	for (n=0; !feof(fp); ++n) {
 		fread(&tile, sizeof(struct Tile), 1, fp);
 		map[n] = tile; 
-      		printf("%i", tile.height);
-		
-		if (n%SIZE == 0)
-			printf("%c", '\n'); 
+	printf(" n: %i",n);	
 	}
 fclose(fp);
 return map;

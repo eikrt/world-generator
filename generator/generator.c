@@ -7,7 +7,7 @@
 #include "../file/file.h"
 
 
-const int GEN_SEED = 64;
+const int GEN_SEED = 0;
 
 int noiseFromTable(int* table, int x, int y) { //gets values from lookup table
 	int n = table[(y + GEN_SEED) % 256];
@@ -41,12 +41,12 @@ float noise(int* table,  float x, float y) // gets noise
 
 float perlin(float x, float y, float freq, int depth) // main noise function
 {
-	
-	int table [256];
+	int tableSize = 256;	
+	int table [tableSize];
 	srandom(time(0));
-	for (int i = 0; i < 256; i++) {
+	for (int i = 0; i < tableSize; i++) {
 			
-			table[i] = random()%256;
+			table[i] = random()%tableSize;
 		}
 	float xa = x*freq;
 	float ya = y*freq;
@@ -56,7 +56,7 @@ float perlin(float x, float y, float freq, int depth) // main noise function
 
 	for(int i=0; i<depth; i++)
 	{
-      		division += 256 * amplification;
+      		division += tableSize * amplification;
         	val += noise(table,xa, ya) * amplification;
        		amplification /= 2;
        		xa *= 2;
@@ -70,7 +70,7 @@ struct Tile* createMap(int sealevel){
 	static struct Tile map[SIZE*SIZE];
 	for (int i = 0; i <SIZE; i++){
 		for (int j = 0; j < SIZE; j++){
-		int val = perlin(i,j,0.1,1)*100-sealevel;
+		int val = perlin(i%64,j%64,0.1,1)*100-sealevel;
 		int roundVal = floor(val);
 		map[(i)*j].height=roundVal;
 

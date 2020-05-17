@@ -5,8 +5,8 @@
 #include "../world/tile.h"
 #include "../file/file.h"
 #include "../io/imgload.h"
-const int SCREEN_WIDTH = 640*2;
-const int SCREEN_HEIGHT = 480*2;
+const int SCREEN_WIDTH = 512*2;
+const int SCREEN_HEIGHT = 288*2;
 struct Camera{
 	int x;
 	int y;
@@ -46,17 +46,26 @@ void loop(SDL_Window *window, SDL_Surface *screenSurface, SDL_Renderer* renderer
 	SDL_Event e;
 	struct Tile* map;
 	map = openWorld("../generator/map/map.dat");
+	
+	int rgb = {255,255,255};
+
+	SDL_Texture* groundTex = loadTexture(screenSurface, renderer, "../res/ground.bmp", rgb);
+	SDL_Texture* waterTex = loadTexture(screenSurface, renderer, "../res/water.bmp", rgb);
 	for (int i = 0; i < SIZE; i++){
+		
 		for (int j = 0; j < SIZE; j++){
 			if (map[i*j].height < 1){
-			int rgb[] = {0,100,100};
-			
-			map[i*j].texture = loadTexture(screenSurface, renderer, "../res/water.bmp", rgb);
+	//	int rgb[] = {0,0,0};	
+		//	int rgb[] = {0,100-0.8*map[i*j].height,100-0.4*map[i*j].height};	
+
+			map[i*j].texture = groundTex;
 		}
 			else {
-			int rgb[] = {200-0.8*map[i*j].height,255-0.8*map[i*j].height,255-0.4*map[i*j].height};	
+	//			int rgb[] = {0,0,0};
+		//	int rgb[] = {200-0.8*map[i*j].height,255-0.8*map[i*j].height,255-0.4*map[i*j].height};	
 
-			map[i*j].texture = loadTexture(screenSurface, renderer, "../res/ground.bmp", rgb);
+			map[i*j].texture = waterTex;
+
 			}
 	}
 	
@@ -93,22 +102,25 @@ else if( e.type == SDL_KEYDOWN )
 		}
 }
 		SDL_RenderClear( renderer );
+		int renderX = camera.x / 16;
+		int renderY = camera.y / 16;
+		for (int i = 0; i < renderY + SCREEN_HEIGHT/16; i++) {	
+			for (int j = 0; j < renderX + SCREEN_WIDTH/16; j++) {
+				if (i > 0 && j > 0 && i < SIZE + renderY&& j < SIZE + renderX) {
 
-		for (int i = 0; i < SIZE; i++) {	
-			for (int j = 0; j < SIZE; j++) {
-				
-				SDL_Rect renderRect;
-				map[i*j].rect.x = i*16;
-				map[i*j].rect.y = j*16;	
-				renderRect.x = map[i*j].rect.x-camera.x;
-				renderRect.y = map[i*j].rect.y-camera.y;
-				renderRect.h = 16;
-				renderRect.w = 16;
-               			SDL_RenderCopy( renderer, map[i*j].texture, NULL, &renderRect);
+					SDL_Rect renderRect;
+					map[i*j].rect.x = i*16;
+					map[i*j].rect.y = j*16;	
+					renderRect.x = map[i*j].rect.x-camera.x;
+					renderRect.y = map[i*j].rect.y-camera.y;
+					renderRect.h = 16;
+					renderRect.w = 16;
+               				SDL_RenderCopy( renderer, map[i*j].texture, NULL, &renderRect);
+				}
 			}		
 		}
 		SDL_RenderPresent(renderer);		
-	SDL_Delay(100);
+	SDL_Delay(32);
 }	
 quit(window);
 }
