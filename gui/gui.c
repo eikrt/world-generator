@@ -44,28 +44,36 @@ void loop(SDL_Window *window, SDL_Surface *screenSurface, SDL_Renderer* renderer
 	camera.x = 0;
 	camera.y = 0;
 	SDL_Event e;
+
 	struct Tile* map;
 	map = openWorld("../generator/map/map.dat");
 	
-	int rgb = {255,255,255};
+
+	int rgb[] = {255,255,255};
 
 	SDL_Texture* groundTex = loadTexture(screenSurface, renderer, "../res/ground.bmp", rgb);
+	
 	SDL_Texture* waterTex = loadTexture(screenSurface, renderer, "../res/water.bmp", rgb);
+
+
 	for (int i = 0; i < SIZE; i++){
 		
 		for (int j = 0; j < SIZE; j++){
 			if (map[i*j].height < 1){
-	//	int rgb[] = {0,0,0};	
-		//	int rgb[] = {0,100-0.8*map[i*j].height,100-0.4*map[i*j].height};	
+	//	int rgb[] = {0,0,0};
+			int rgb2[] = {0,100,100};	
+			map[i*j].texture = colorTexture(waterTex, rgb2);
 
-			map[i*j].texture = groundTex;
+
+//			map[i*j].texture = loadTexture(screenSurface, renderer, "../res/water.bmp", rgb2);
 		}
 			else {
 	//			int rgb[] = {0,0,0};
-		//	int rgb[] = {200-0.8*map[i*j].height,255-0.8*map[i*j].height,255-0.4*map[i*j].height};	
+			int rgb2[] = {200,255,255};	
 
-			map[i*j].texture = waterTex;
+			map[i*j].texture = colorTexture(groundTex,rgb2);
 
+			//map[i*j].texture = loadTexture(screenSurface, renderer, "../res/ground.bmp", rgb2);
 			}
 	}
 	
@@ -104,8 +112,8 @@ else if( e.type == SDL_KEYDOWN )
 		SDL_RenderClear( renderer );
 		int renderX = camera.x / 16;
 		int renderY = camera.y / 16;
-		for (int i = 0; i < renderY + SCREEN_HEIGHT/16; i++) {	
-			for (int j = 0; j < renderX + SCREEN_WIDTH/16; j++) {
+		for (int i = 0; i < renderX + SCREEN_WIDTH/16; i++) {	
+			for (int j = 0; j < renderY + SCREEN_HEIGHT/16; j++) {
 				if (i > 0 && j > 0 && i < SIZE + renderY&& j < SIZE + renderX) {
 
 					SDL_Rect renderRect;

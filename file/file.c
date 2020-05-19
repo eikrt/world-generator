@@ -26,10 +26,10 @@ struct Tile* openWorld(const char * fileName)
 	int n = 0;
 	static struct Tile map[SIZE*SIZE];
 	struct Tile tile;
+
 	for (n=0; !feof(fp); ++n) {
 		fread(&tile, sizeof(struct Tile), 1, fp);
 		map[n] = tile; 
-	printf(" n: %i",n);	
 	}
 fclose(fp);
 return map;
