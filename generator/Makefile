@@ -1,4 +1,4 @@
-OBJS = generator.c generator.h ../file/file.c ../file/file.h ../world/tile.h
+OBJS = generator.c generator.h ../file/file.c ../file/file.h ../world/tile.h ../world/entity.h
 
 CC = gcc
 

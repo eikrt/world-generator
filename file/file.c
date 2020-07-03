@@ -3,21 +3,35 @@
 #include <time.h>
 #include <math.h>
 #include "../world/tile.h"
+#include "../world/entity.h"
 #include "../generator/generator.h"
 
 
 
 
-void saveWorld(struct Tile* map, const char * fileName)
+void saveMap(struct Tile* map, const char* fileName)
 {
   FILE* fp = fopen(fileName,"wb");
 
+	if (!fp) return;
 	for (int i = 0; i < SIZE; i++){
 		for (int j = 0; j < SIZE; j++){
   			fwrite( &map[i*j], sizeof(struct Tile), 1, fp);
 		}
 	}
   fclose(fp);
+}
+void saveEntities(struct Entity* entities, const char* fileName) {
+
+	FILE* fp = fopen(fileName,"wb");
+	
+	if (!fp) return;
+	for (int i = 0; i < ENTITYNUMBER; i++) {
+		
+		fwrite(&entities[i], sizeof(struct Entity), 1, fp);
+	}
+	fclose(fp);
+
 }
 struct Tile* openWorld(const char * fileName)
 {
