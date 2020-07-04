@@ -3,6 +3,7 @@
 #include "../generator/generator.h"
 #include <stdio.h>
 #include "../world/tile.h"
+#include "../world/entity.h"
 #include "../file/file.h"
 #include "../io/imgload.h"
 const int SCREEN_WIDTH = 512*2;
@@ -46,14 +47,16 @@ void loop(SDL_Window *window, SDL_Surface *screenSurface, SDL_Renderer* renderer
 	SDL_Event e;
 
 	struct Tile* map;
-	map = openWorld("../generator/map/map.dat");
-	
-
+	struct Entity* entities;
+	map = openWorld("../generator/world/map.dat");
+	entities = openEntities("../generator/world/entities.dat");
 	int rgb[] = {255,255,255};
 
 	SDL_Texture* groundTex = loadTexture(screenSurface, renderer, "../res/ground.bmp", rgb);
 	
+
 	SDL_Texture* waterTex = loadTexture(screenSurface, renderer, "../res/water.bmp", rgb);
+	SDL_Texture* treeTex = loadTexture(screenSurface, renderer, "../res/tree.bmp", rgb);
 
 
 	for (int i = 0; i < SIZE; i++){
@@ -80,7 +83,11 @@ void loop(SDL_Window *window, SDL_Surface *screenSurface, SDL_Renderer* renderer
 	}	
 
 
-
+	for (int i = 0; i < ENTITYNUMBER; i++) {
+		
+			int rgb2[] = {200,55,255};	
+			entities[i].texture = colorTexture(treeTex, rgb2);	
+	}
 
 	while(running==1) {
 		
@@ -123,9 +130,28 @@ else if( e.type == SDL_KEYDOWN )
 					renderRect.y = map[i*j].rect.y-camera.y;
 					renderRect.h = 16;
 					renderRect.w = 16;
+
                				SDL_RenderCopy( renderer, map[i*j].texture, NULL, &renderRect);
 				}
 			}		
+		}
+		for (int i = 0; i < ENTITYNUMBER; i++) {
+		
+			SDL_Rect renderRect;
+			entities[i].rect.x = entities[i].x;
+			entities[i].rect.y = entities[i].y;
+
+			renderRect.x = entities[i].rect.x - camera.x;
+			renderRect.y = entities[i].rect.y - camera.y;
+
+			renderRect.w = 16;
+			renderRect.h = 16;
+			
+			
+               		SDL_RenderCopy( renderer, entities[i].texture, NULL, &renderRect);
+	
+						
+			
 		}
 		SDL_RenderPresent(renderer);		
 	SDL_Delay(32);

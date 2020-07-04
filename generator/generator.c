@@ -116,7 +116,9 @@ static struct Entity* createEntities() {
 	static struct Entity entities[ENTITYNUMBER];
 	for (int i = 0; i < ENTITYNUMBER; i++) {
 			
-			entities[i].type = 1;			
+			entities[i].type = 1;
+			entities[i].x = i*16;
+			entities[i].y = 0;			
 			
 
 		}

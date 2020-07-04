@@ -48,4 +48,16 @@ struct Tile* openWorld(const char * fileName)
 fclose(fp);
 return map;
 }
-
+struct Entity* openEntities(const char * fileName) {
+	FILE* fp = fopen(fileName,"rb");
+	if (!fp) return 0;
+	int n = 0;
+	static struct Entity entities[ENTITYNUMBER];
+	struct Entity entity;
+	for (n=0; !feof(fp); ++n) {
+		fread(&entity, sizeof(struct Entity), 1, fp);
+		entities[n] = entity;
+	}
+	fclose(fp);
+	return entities;
+}
