@@ -87,7 +87,6 @@ static struct Tile* createMap(int sealevel){
 				map[i*j].height = 0;
 
 			}
-			printf("%i", currentChunk);
 		}
 		
 	}
@@ -114,11 +113,16 @@ static struct Tile* createMap(int sealevel){
 static struct Entity* createEntities() {
 
 	static struct Entity entities[ENTITYNUMBER];
+	
+	time_t t;
+	srand((unsigned) time(&t));
 	for (int i = 0; i < ENTITYNUMBER; i++) {
-			
+
+			printf("%i", rand() % SIZE);
+					
 			entities[i].type = 1;
-			entities[i].x = i*16;
-			entities[i].y = 0;			
+			entities[i].x = rand() % SIZE * 16;
+			entities[i].y = rand() % SIZE * 16;			
 			
 
 		}
